@@ -1,13 +1,13 @@
 import arcade
 import random
 
+
 width = 800
 height = 600
 title = "tapper"
 beer_speed = 7
 person_speed = 2
 bars = 4
-
 
 class Beer(arcade.Sprite):
     def update(self):
@@ -22,10 +22,9 @@ class Customer(arcade.Sprite):
         if self.left < 0:
             self.kill()
 
-
-class RootBeerTapper(arcade.Window):
+class RootBeerTapper(arcade.View):
     def __init__(self):
-        super().__init__(width, height, title)
+        super().__init__()
         self.player_sprite = None
         self.beer_list = None
         self.customer_list = None
@@ -33,13 +32,17 @@ class RootBeerTapper(arcade.Window):
         self.all_bars_y = [150, 250, 350, 450]
         self.score = 0
 
-    def setup(self):
         self.player_sprite = arcade.SpriteSolidColor(50, 50, arcade.color.BROWN)
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = self.all_bars_y[self.current_bar]
         self.beer_list = arcade.SpriteList()
         self.customer_list = arcade.SpriteList()
         arcade.schedule(self.add_customer, 2)
+
+
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.BLACK)
+
 
     def add_customer(self, delta_time: float):
         customer = Customer("customer_image.png", 0.5)
@@ -63,6 +66,14 @@ class RootBeerTapper(arcade.Window):
                 beer.kill()
                 customer.kill()
                 self.score += 1
+                self.window.total_score += 1
+        from start_and_end_screen import GameOverView   ##hella jenky idk if you can even do this but i was getting circular import errors otherwise
+        #I think its a bigger issue with the code structure but we can fix it later, this will be good to turn in for now
+        if self.score == 3:
+            game_over_view = GameOverView()
+            self.window.show_view(game_over_view)
+
+
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.UP and self.current_bar < bars - 1:
@@ -78,10 +89,7 @@ class RootBeerTapper(arcade.Window):
             self.beer_list.append(beer)
 
 
-def main():
-    game = RootBeerTapper()
-    game.setup()
-    arcade.run()
+
 
 
 if __name__ == "__main__":
