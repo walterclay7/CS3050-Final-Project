@@ -126,6 +126,60 @@ class RootBeerTapper(arcade.View):
     def on_draw(self):
         arcade.start_render()
 
+        wall_width = 100  # Thickness of the wall
+        wall_color = arcade.color.NAVY_BLUE  # Color of the wall
+        tilt_amount = 60  # How much to tilt the inner side
+
+        # right wall
+        # bottom right
+        x1, y1 = width, 0
+        # top right
+        x2, y2 = width, height
+        # top left
+        x3, y3 = width - wall_width, height - 100
+        # bottom left
+        x4, y4 = width - wall_width + tilt_amount, 0
+
+        # draw the right wall
+        arcade.draw_polygon_filled([(x1, y1), (x2, y2), (x3, y3), (x4, y4)], wall_color)
+        # back wall
+        arcade.draw_rectangle_filled(width//2, height, width*0.75, 200, arcade.color.BLUE)
+
+        # right triangle
+        # top left
+        x1, y1 = width - wall_width, height
+        # top right
+        x2, y2 = width, height
+        # bottom left
+        x3, y3 = width - wall_width, height - 100
+
+        arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color.NAVY_BLUE)
+
+
+        # TODO: fix overlap
+
+        # left wall
+        # bottom right
+        x1, y1 = wall_width - tilt_amount, 0
+        # top right
+        x2, y2 = 100, 500
+        # top left
+        x3, y3 = 0, height
+        # bottom left
+        x4, y4 = 0, 0
+
+        arcade.draw_polygon_filled([(x1, y1), (x2, y2), (x3, y3), (x4, y4)], arcade.color.NAVY_BLUE)
+
+        # left triangle
+        # top left
+        x1, y1 = 0, height
+        # top right
+        x2, y2 = wall_width, height
+        # bottom right
+        x3, y3 = 100, 500
+
+        arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color.NAVY_BLUE)
+
         # draw background ->bars
         perp_rec = 10
         bar_width = width + 10
