@@ -156,31 +156,7 @@ class RootBeerTapper(arcade.View):
         arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color.NAVY_BLUE)
 
 
-        # TODO: fix overlap
 
-        # left wall
-        # bottom right
-        x1, y1 = wall_width - tilt_amount, 0
-        # top right
-        x2, y2 = 100, 500
-        # top left
-        x3, y3 = 0, height
-        # bottom left
-        x4, y4 = 0, 0
-
-        arcade.draw_polygon_filled([(x1, y1), (x2, y2), (x3, y3), (x4, y4)], arcade.color.NAVY_BLUE)
-
-        # left triangle
-        # top left
-        x1, y1 = 0, height
-        # top right
-        x2, y2 = wall_width, height
-        # bottom right
-        x3, y3 = 100, 500
-
-        arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color.NAVY_BLUE)
-
-        # draw background ->bars
         perp_rec = 10
         bar_width = width + 10
         bar_height = 30
@@ -205,6 +181,84 @@ class RootBeerTapper(arcade.View):
 
                 # actually draw them
                 arcade.draw_rectangle_filled(rect_x, rect_y, rect_width / perp_rec, bar_height, arcade.color_from_hex_string("#53220F"))
+
+
+
+        # TODO: fix overlap
+
+        # left wall
+        # bottom right
+        x1, y1 = wall_width - tilt_amount, 0
+        # top right
+        x2, y2 = 100, 500
+        # top left
+        x3, y3 = 0, height
+        # bottom left
+        x4, y4 = 0, 0
+
+        arcade.draw_polygon_filled([(x1, y1), (x2, y2), (x3, y3), (x4, y4)], arcade.color.NAVY_BLUE)
+
+        # left triangle
+        # top left
+        x1, y1 = 0, height
+        # top right
+        x2, y2 = wall_width, height
+        # bottom right
+        x3, y3 = 100, 500
+
+        arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color.NAVY_BLUE)
+
+        # budweiser sign
+        points = [
+            # (375, 425),  # top center **
+            # (475, 450),  # top right
+            # (475, 350),  # bottom right
+            # (375, 380),  # bottom center **
+            # (300, 350),  # bottom left
+            # (300, 450)  # top left
+
+            (385, 575),  # top center **
+            (500, 600),  # top right
+            (500, 500),  # bottom right
+            (385, 530),  # bottom center **
+            (300, 500),  # bottom left
+            (300, 600)  # top left
+        ]
+
+        arcade.draw_polygon_filled(points, arcade.color.RED)
+
+        arcade.draw_text("Budweiser", width / 2, height - 55,
+                     arcade.color.WHITE, font_size=20, anchor_x="center")
+
+
+
+
+
+        # # draw background ->bars
+        # perp_rec = 10
+        # bar_width = width + 10
+        # bar_height = 30
+        # rect_width = bar_width // perp_rec
+        # shadow_height = 4
+        #
+        # bar_start_x = width // 3 - bar_width // 2
+        #
+        # # add background bars
+        # for y_position in self.all_bars_y:
+        #     arcade.draw_rectangle_filled(width // 3, y_position + 25, bar_width, bar_height,
+        #                                  arcade.color_from_hex_string("#622A0F")) #994E31
+        #     # arcade.draw_rectangle_filled(width // 3, y_position + 25, bar_width, bar_height, arcade.color.from_hex_string("#994E31"))
+        #     arcade.draw_rectangle_filled(width // 3, y_position + 17, bar_width, shadow_height, arcade.color.BLACK)
+        #
+        #     arcade.draw_rectangle_filled(width // 3, y_position, bar_width, bar_height, arcade.color_from_hex_string("#923B1B"))
+        #     # perpendicular bars underneath
+        #
+        #     for i in range(perp_rec):
+        #         rect_x = bar_start_x + i * rect_width + rect_width // 2
+        #         rect_y = y_position
+        #
+        #         # actually draw them
+        #         arcade.draw_rectangle_filled(rect_x, rect_y, rect_width / perp_rec, bar_height, arcade.color_from_hex_string("#53220F"))
 
         self.player_sprite.draw()
         self.beer_list.draw()
