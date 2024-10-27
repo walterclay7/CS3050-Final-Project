@@ -155,8 +155,6 @@ class RootBeerTapper(arcade.View):
 
         arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color.NAVY_BLUE)
 
-
-
         perp_rec = 10
         bar_width = width + 10
         bar_height = 30
@@ -167,24 +165,22 @@ class RootBeerTapper(arcade.View):
 
         # add background bars
         for y_position in self.all_bars_y:
+
+            # TODO: tilt bar parallel to wall
             arcade.draw_rectangle_filled(width // 3, y_position + 25, bar_width, bar_height,
-                                         arcade.color_from_hex_string("#622A0F")) #994E31
-            # arcade.draw_rectangle_filled(width // 3, y_position + 25, bar_width, bar_height, arcade.color.from_hex_string("#994E31"))
+                                         arcade.color_from_hex_string("#622A0F"))
+
             arcade.draw_rectangle_filled(width // 3, y_position + 17, bar_width, shadow_height, arcade.color.BLACK)
 
             arcade.draw_rectangle_filled(width // 3, y_position, bar_width, bar_height, arcade.color_from_hex_string("#923B1B"))
-            # perpendicular bars underneath
 
+            # perpendicular bars underneath
             for i in range(perp_rec):
                 rect_x = bar_start_x + i * rect_width + rect_width // 2
                 rect_y = y_position
 
                 # actually draw them
                 arcade.draw_rectangle_filled(rect_x, rect_y, rect_width / perp_rec, bar_height, arcade.color_from_hex_string("#53220F"))
-
-
-
-        # TODO: fix overlap
 
         # left wall
         # bottom right
@@ -210,13 +206,6 @@ class RootBeerTapper(arcade.View):
 
         # budweiser sign
         points = [
-            # (375, 425),  # top center **
-            # (475, 450),  # top right
-            # (475, 350),  # bottom right
-            # (375, 380),  # bottom center **
-            # (300, 350),  # bottom left
-            # (300, 450)  # top left
-
             (385, 575),  # top center **
             (500, 600),  # top right
             (500, 500),  # bottom right
@@ -229,36 +218,6 @@ class RootBeerTapper(arcade.View):
 
         arcade.draw_text("Budweiser", width / 2, height - 55,
                      arcade.color.WHITE, font_size=20, anchor_x="center")
-
-
-
-
-
-        # # draw background ->bars
-        # perp_rec = 10
-        # bar_width = width + 10
-        # bar_height = 30
-        # rect_width = bar_width // perp_rec
-        # shadow_height = 4
-        #
-        # bar_start_x = width // 3 - bar_width // 2
-        #
-        # # add background bars
-        # for y_position in self.all_bars_y:
-        #     arcade.draw_rectangle_filled(width // 3, y_position + 25, bar_width, bar_height,
-        #                                  arcade.color_from_hex_string("#622A0F")) #994E31
-        #     # arcade.draw_rectangle_filled(width // 3, y_position + 25, bar_width, bar_height, arcade.color.from_hex_string("#994E31"))
-        #     arcade.draw_rectangle_filled(width // 3, y_position + 17, bar_width, shadow_height, arcade.color.BLACK)
-        #
-        #     arcade.draw_rectangle_filled(width // 3, y_position, bar_width, bar_height, arcade.color_from_hex_string("#923B1B"))
-        #     # perpendicular bars underneath
-        #
-        #     for i in range(perp_rec):
-        #         rect_x = bar_start_x + i * rect_width + rect_width // 2
-        #         rect_y = y_position
-        #
-        #         # actually draw them
-        #         arcade.draw_rectangle_filled(rect_x, rect_y, rect_width / perp_rec, bar_height, arcade.color_from_hex_string("#53220F"))
 
         self.player_sprite.draw()
         self.beer_list.draw()
@@ -275,8 +234,6 @@ class RootBeerTapper(arcade.View):
                 customer.kill()
                 self.score += 1
                 self.window.total_score += 1
-        # from start_and_end_screen import GameOverView   ##hella jenky idk if you can even do this but i was getting circular import errors otherwise
-        # I think its a bigger issue with the code structure but we can fix it later, this will be good to turn in for now
         if self.score == 3:
             game_over_view = GameOverView()
             self.window.show_view(game_over_view)
