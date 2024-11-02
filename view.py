@@ -97,6 +97,9 @@ class Beer(arcade.Sprite):
 
 
 class Customer(arcade.Sprite):
+    def __init__(self, image, scale, bar_index):
+        super().__init__(image, scale)
+        self.bar_index = bar_index
     def update(self):
         self.center_x -= person_speed
         if self.left < 0:
@@ -126,7 +129,9 @@ class RootBeerTapper(arcade.View):
         self.customer_list = None
         self.current_bar = 0
         self.all_bars_y = [150, 250, 350, 450]
+        self.end_x_positions = [89, 90, 90, 91]
         self.score = 0
+        self.lives = 3
 
         self.player_sprite = Player("Tapper_bartender.png", .75, flipped_horizontally=False)
         self.player_sprite.center_x = 50
@@ -139,9 +144,10 @@ class RootBeerTapper(arcade.View):
         arcade.set_background_color(arcade.color_from_hex_string("#454545"))
 
     def add_customer(self, delta_time: float):
-        customer = Customer("Tapper_cowboy1.png", 1.5, flipped_horizontally=True)
+        bar_index = random.randint(0, len(self.all_bars_y) - 1)
+        customer = Customer("Tapper_cowboy1.png", 1.5, bar_index)
         customer.center_x = width - 50
-        customer.center_y = random.choice(self.all_bars_y)+65 #places characters right above bar
+        customer.center_y = self.all_bars_y[bar_index] + 65 #places characters right above bar
         self.customer_list.append(customer)
 
     def on_draw(self):
@@ -248,9 +254,14 @@ class RootBeerTapper(arcade.View):
         self.customer_list.draw()
         arcade.draw_text(f"Score: {self.score}", 10, height - 30, arcade.color.WHITE, 20)
 
+        # lives
+        arcade.draw_text(f"Lives: {self.lives}", 10, height - 60, arcade.color.WHITE, 20)
+
+
     def on_update(self, delta_time):
         self.beer_list.update()
         self.customer_list.update()
+
         for beer in self.beer_list:
             customers_hit = arcade.check_for_collision_with_list(beer, self.customer_list)
             for customer in customers_hit:
@@ -258,9 +269,29 @@ class RootBeerTapper(arcade.View):
                 customer.kill()
                 self.score += 1
                 self.window.total_score += 1
+
+            if beer.right >= width - 100:
+                self.lives -= 1
+                beer.kill()
+
+                if self.lives <= 0:
+                    game_over_view = GameOverView()
+                    self.window.show_view(game_over_view)
+
+        # Check if any customer reached the end of the bar
+        for customer in self.customer_list:
+            bar_end_x = self.end_x_positions[customer.bar_index]
+            if customer.center_x <= bar_end_x:
+                customer.kill()
+                self.lives -= 1
+                if self.lives <= 0:
+                    game_over_view = GameOverView()
+                    self.window.show_view(game_over_view)
+
         if self.score == 3:
             game_over_view = GameOverView()
             self.window.show_view(game_over_view)
+
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.UP and self.current_bar < bars - 1:
