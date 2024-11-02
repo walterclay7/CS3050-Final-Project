@@ -1,5 +1,6 @@
 import arcade
 import random
+
 # from tester import RootBeerTapper
 
 # variables for MenuView
@@ -10,9 +11,11 @@ beer_speed = 7
 person_speed = 2
 bars = 4
 
+
 class MenuView(arcade.View):
     def on_show_view(self):
         arcade.set_background_color(arcade.color.WHITE)
+
     # def on_show(self):
     #     arcade.set_background_color(arcade.color.WHITE)
 
@@ -47,6 +50,7 @@ class InstructionView(arcade.View):
         game_view = RootBeerTapper()
         self.window.show_view(game_view)
 
+
 class GameOverView(arcade.View):
     def __init__(self):
         super().__init__()
@@ -75,14 +79,15 @@ class GameOverView(arcade.View):
             self.current_bar -= 1
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
         if key == arcade.key.SPACE:
-            beer = Beer("beer_image.png", 0.3)
+            beer = Beer("Tapper_mug_full.png", 0.55)
             beer.center_x = self.player_sprite.center_x + 50
-            beer.center_y = self.player_sprite.center_y
+            beer.center_y = self.player_sprite.center_y + 50
             self.beer_list.append(beer)
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         instructions_view = InstructionView()
         self.window.show_view(instructions_view)
+
 
 class Beer(arcade.Sprite):
     def update(self):
@@ -97,6 +102,22 @@ class Customer(arcade.Sprite):
         if self.left < 0:
             self.kill()
 
+
+# class for player sprite
+class Player(arcade.Sprite):
+    def update(self):
+        # check for out of bounds
+        if self.left < 0:
+            self.left = 0
+        elif self.right > width - 1:
+            self.right = width - 1
+
+        if self.bottom < 0:
+            self.bottom = 0
+        elif self.top > height - 1:
+            self.top = height - 1
+
+
 class RootBeerTapper(arcade.View):
     def __init__(self):
         super().__init__()
@@ -107,7 +128,7 @@ class RootBeerTapper(arcade.View):
         self.all_bars_y = [150, 250, 350, 450]
         self.score = 0
 
-        self.player_sprite = arcade.SpriteSolidColor(50, 50, arcade.color.BROWN)
+        self.player_sprite = Player("Tapper_bartender.png", .75, flipped_horizontally=False)
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = self.all_bars_y[self.current_bar]
         self.beer_list = arcade.SpriteList()
@@ -118,9 +139,9 @@ class RootBeerTapper(arcade.View):
         arcade.set_background_color(arcade.color_from_hex_string("#454545"))
 
     def add_customer(self, delta_time: float):
-        customer = Customer("customer_image.png", 0.5)
+        customer = Customer("Tapper_cowboy1.png", 1.5, flipped_horizontally=True)
         customer.center_x = width - 50
-        customer.center_y = random.choice(self.all_bars_y)
+        customer.center_y = random.choice(self.all_bars_y)+65 #places characters right above bar
         self.customer_list.append(customer)
 
     def on_draw(self):
@@ -143,7 +164,7 @@ class RootBeerTapper(arcade.View):
         # draw the right wall
         arcade.draw_polygon_filled([(x1, y1), (x2, y2), (x3, y3), (x4, y4)], wall_color)
         # back wall
-        arcade.draw_rectangle_filled(width//2, height, width*0.75, 200, arcade.color.BLUE)
+        arcade.draw_rectangle_filled(width // 2, height, width * 0.75, 200, arcade.color.BLUE)
 
         # right triangle
         # top left
@@ -172,15 +193,18 @@ class RootBeerTapper(arcade.View):
 
             arcade.draw_rectangle_filled(width // 3, y_position + 17, bar_width, shadow_height, arcade.color.BLACK)
 
-            arcade.draw_rectangle_filled(width // 3, y_position, bar_width, bar_height, arcade.color_from_hex_string("#923B1B"))
+            arcade.draw_rectangle_filled(width // 3, y_position, bar_width, bar_height,
+                                         arcade.color_from_hex_string("#923B1B"))
 
             # perpendicular bars underneath
+
             for i in range(perp_rec):
                 rect_x = bar_start_x + i * rect_width + rect_width // 2
                 rect_y = y_position
 
                 # actually draw them
-                arcade.draw_rectangle_filled(rect_x, rect_y, rect_width / perp_rec, bar_height, arcade.color_from_hex_string("#53220F"))
+                arcade.draw_rectangle_filled(rect_x, rect_y, rect_width / perp_rec, bar_height,
+                                             arcade.color_from_hex_string("#53220F"))
 
         # left wall
         # bottom right
@@ -217,7 +241,7 @@ class RootBeerTapper(arcade.View):
         arcade.draw_polygon_filled(points, arcade.color.RED)
 
         arcade.draw_text("Budweiser", width / 2, height - 55,
-                     arcade.color.WHITE, font_size=20, anchor_x="center")
+                         arcade.color.WHITE, font_size=20, anchor_x="center")
 
         self.player_sprite.draw()
         self.beer_list.draw()
@@ -246,7 +270,7 @@ class RootBeerTapper(arcade.View):
             self.current_bar -= 1
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
         if key == arcade.key.SPACE:
-            beer = Beer("beer_image.png", 0.3)
+            beer = Beer("Tapper_mug_full.png", .55)
             beer.center_x = self.player_sprite.center_x + 50
-            beer.center_y = self.player_sprite.center_y
+            beer.center_y = self.player_sprite.center_y + 50    #places beers right on top of bars
             self.beer_list.append(beer)
