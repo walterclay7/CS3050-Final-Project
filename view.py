@@ -90,12 +90,43 @@ class Beer(arcade.Sprite):
         if self.right > width:
             self.kill()
 
+# class for the empty glass -johnna
+#guys this is so bad i swear it does not work
+class Glass(arcade.Sprite):
+    def update(self):
+        self.center_x -= beer_speed
+        if self.right  <0:
+            game_over_view = GameOverView()
+            self.window.show_view(game_over_view)
 
 class Customer(arcade.Sprite):
+    def __init__(self, view, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.view = view  # Store the reference to the view
+        self.drinking = False
+
+
     def update(self):
-        self.center_x -= person_speed
-        if self.left < 0:
+        if not self.drinking:
+            self.center_x -= person_speed
+            if self.center_x < 100:
+                self.drinking = True
+                # arcade.schedule(self.throw_glass_back, 0)
+
+    def throw_glass_back(self, delta_time: float):
+        if self.drinking:
+            glass = Glass("glass_image.png", 0.3)
+            glass.center_x = self.center_x
+            glass.center_y = self.center_y
+            self.view.beer_list.append(glass)  # Use self.view to access beer_list
+            # arcade.unschedule(self.throw_glass_back)
             self.kill()
+
+    #original code for customer class
+    # def update(self):
+    #     self.center_x -= person_speed
+    #     if self.left < 0:
+    #         self.kill()
 
 class RootBeerTapper(arcade.View):
     def __init__(self):
@@ -118,7 +149,7 @@ class RootBeerTapper(arcade.View):
         arcade.set_background_color(arcade.color_from_hex_string("#454545"))
 
     def add_customer(self, delta_time: float):
-        customer = Customer("customer_image.png", 0.5)
+        customer = Customer(self, "customer_image.png", 0.25)  # Pass `self` as the view
         customer.center_x = width - 50
         customer.center_y = random.choice(self.all_bars_y)
         self.customer_list.append(customer)
@@ -231,10 +262,12 @@ class RootBeerTapper(arcade.View):
             customers_hit = arcade.check_for_collision_with_list(beer, self.customer_list)
             for customer in customers_hit:
                 beer.kill()
-                customer.kill()
+                customer.drinking = True
+                print("customer got beer")
+                arcade.schedule(customer.throw_glass_back, 2)  # Schedule throwing glass
                 self.score += 1
                 self.window.total_score += 1
-        if self.score == 3:
+        if self.score == 10:
             game_over_view = GameOverView()
             self.window.show_view(game_over_view)
 
