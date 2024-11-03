@@ -48,8 +48,9 @@ class InstructionView(arcade.View):
         self.window.show_view(game_view)
 
 class GameOverView(arcade.View):
-    def __init__(self):
+    def __init__(self, score=0):
         super().__init__()
+        self.score = score
 
     # def on_show(self):
     #     arcade.set_background_color(arcade.color.BLACK)
@@ -85,6 +86,9 @@ class GameOverView(arcade.View):
         self.window.show_view(instructions_view)
 
 class Beer(arcade.Sprite):
+    def __init__(self, image, scaling, view):
+        super().__init__(image, scaling)
+        self.view = view
     def update(self):
         self.center_x += beer_speed
         if self.right > width:
@@ -93,11 +97,14 @@ class Beer(arcade.Sprite):
 # class for the empty glass -johnna
 #guys this is so bad i swear it does not work
 class Glass(arcade.Sprite):
+    def __init__(self, image, scaling, view):
+        super().__init__(image, scaling)
+        self.view = view
     def update(self):
         self.center_x -= beer_speed
         if self.right  <0:
             game_over_view = GameOverView()
-            self.window.show_view(game_over_view)
+            self.view.window.show_view(game_over_view)
 
 class Customer(arcade.Sprite):
     def __init__(self, view, *args, **kwargs):
@@ -115,11 +122,10 @@ class Customer(arcade.Sprite):
 
     def throw_glass_back(self, delta_time: float):
         if self.drinking:
-            glass = Glass("glass_image.png", 0.3)
+            glass = Glass("glass_image.png", 0.3, self.view)
             glass.center_x = self.center_x
             glass.center_y = self.center_y
-            self.view.beer_list.append(glass)  # Use self.view to access beer_list
-            # arcade.unschedule(self.throw_glass_back)
+            self.view.beer_list.append(glass)
             self.kill()
 
     #original code for customer class
@@ -268,7 +274,7 @@ class RootBeerTapper(arcade.View):
                 self.score += 1
                 self.window.total_score += 1
         if self.score == 10:
-            game_over_view = GameOverView()
+            game_over_view = GameOverView(self.score)
             self.window.show_view(game_over_view)
 
     def on_key_press(self, key, modifiers):
@@ -279,7 +285,7 @@ class RootBeerTapper(arcade.View):
             self.current_bar -= 1
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
         if key == arcade.key.SPACE:
-            beer = Beer("beer_image.png", 0.3)
+            beer = Beer("beer_image.png", 0.3, self)
             beer.center_x = self.player_sprite.center_x + 50
             beer.center_y = self.player_sprite.center_y
             self.beer_list.append(beer)
