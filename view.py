@@ -70,20 +70,6 @@ class GameOverView(arcade.View):
 
         output_total = f"Total Score: {self.window.total_score}"
         arcade.draw_text(output_total, 10, 10, arcade.color.WHITE, 14)
-
-    def on_key_press(self, key, modifiers):
-        if key == arcade.key.UP and self.current_bar < bars - 1:
-            self.current_bar += 1
-            self.player_sprite.center_y = self.all_bars_y[self.current_bar]
-        elif key == arcade.key.DOWN and self.current_bar > 0:
-            self.current_bar -= 1
-            self.player_sprite.center_y = self.all_bars_y[self.current_bar]
-        if key == arcade.key.SPACE:
-            beer = Beer("Tapper_mug_full.png", 0.55)
-            beer.center_x = self.player_sprite.center_x + 50
-            beer.center_y = self.player_sprite.center_y + 50
-            self.beer_list.append(beer)
-
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         instructions_view = InstructionView()
         self.window.show_view(instructions_view)
@@ -97,8 +83,8 @@ class Beer(arcade.Sprite):
 
 
 class Customer(arcade.Sprite):
-    def __init__(self, image, scale, bar_index):
-        super().__init__(image, scale)
+    def __init__(self, image, scale, bar_index, *args, **kwargs):
+        super().__init__(image, scale, *args, **kwargs)
         self.bar_index = bar_index
     def update(self):
         self.center_x += person_speed   #change to += beer_speed to reverse
@@ -124,12 +110,13 @@ class Player(arcade.Sprite):
 class RootBeerTapper(arcade.View):
     def __init__(self):
         super().__init__()
+        self.lives = 3
         self.player_sprite = None
         self.beer_list = None
         self.customer_list = None
         self.current_bar = 0
         self.all_bars_y = [150, 250, 350, 450]
-        self.end_x_positions = [89, 90, 90, 91]
+        self.end_x_positions = [width - 89, width-90, width-90, width - 91] #TODO: change to be more precise to end of bar
         self.score = 0
 
         self.player_sprite = Player("Tapper_bartender.png", .75, flipped_horizontally=True)
@@ -144,7 +131,7 @@ class RootBeerTapper(arcade.View):
 
     def add_customer(self, delta_time: float):
         bar_index = random.randint(0, len(self.all_bars_y) - 1)
-        customer = Customer("Tapper_cowboy1.png", 1.5, flipped_horizontally=False)
+        customer = Customer("Tapper_cowboy1.png", 1.5, bar_index, flipped_horizontally=False)
         customer.center_x = 50
         customer.center_y = self.all_bars_y[bar_index] + 65 #places characters right above bar
         self.customer_list.append(customer)
@@ -278,7 +265,7 @@ class RootBeerTapper(arcade.View):
         # Check if any customer reached the end of the bar
         for customer in self.customer_list:
             bar_end_x = self.end_x_positions[customer.bar_index]
-            if customer.center_x <= bar_end_x:
+            if customer.center_x >= bar_end_x:
                 customer.kill()
                 self.lives -= 1
                 if self.lives <= 0:
