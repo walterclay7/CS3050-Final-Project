@@ -70,16 +70,26 @@ class GameOverView(arcade.View):
 
         output_total = f"Total Score: {self.window.total_score}"
         arcade.draw_text(output_total, 10, 10, arcade.color.WHITE, 14)
+
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         instructions_view = InstructionView()
         self.window.show_view(instructions_view)
 
 
-class Beer(arcade.Sprite):
+class Beer(arcade.Sprite):  #changed this class
+    def __init__(self, image, scale, full):
+        super().__init__(image, scale)
+        self.full = full
+
     def update(self):
-        self.center_x -= beer_speed     #change to -= beer_speed
-        if self.left < 0:  #reverse this as well
-            self.kill()
+        if self.full is True:
+            self.center_x -= beer_speed
+            if self.left < 0:
+                self.kill()
+        else:
+            self.center_x += beer_speed
+            if self.right > width:
+                self.kill()
 
 
 class EmptyGlass(arcade.Sprite):
@@ -100,6 +110,7 @@ class EmptyGlass(arcade.Sprite):
         elif self.center_y < self.target_y:
             self.center_y += self.speed
 
+
 class Customer(arcade.Sprite):
     def __init__(self, image, scale, bar_index, view, *args, **kwargs):
         super().__init__(image, scale, *args, **kwargs)
@@ -107,17 +118,21 @@ class Customer(arcade.Sprite):
         self.view = view
         self.drinking = False
 
-    def throw_empty_glass(self):
-        empty_glass = EmptyGlass("Tapper_mug_empty.png", 0.3, self.view.player_sprite.center_x,
+    def throw_empty_glass(self, all_bars_y):    #changed this method
+        empty_glass = Beer("Tapper_mug_empty.png", 0.55, False)
+        empty_glass.center_x = self.center_x
+        empty_glass.center_y = all_bars_y[self.bar_index] + 50
+        self.view.beer_list.append(empty_glass)
+        """
+        empty_glass = EmptyGlass("Tapper_mug_empty.png", 0.55, self.view.player_sprite.center_x,
                                  self.view.player_sprite.center_y)
         empty_glass.center_x = self.center_x
         empty_glass.center_y = self.center_y
-        self.view.beer_list.append(empty_glass)
-
+        self.view.beer_list.append(empty_glass)"""
 
     def update(self):
-        self.center_x += person_speed   #change to += beer_speed to reverse
-        if self.right > width:   #reversed
+        self.center_x += person_speed  # change to += beer_speed to reverse
+        if self.right > width:  # reversed
             self.kill()
 
 
@@ -145,7 +160,8 @@ class RootBeerTapper(arcade.View):
         self.customer_list = None
         self.current_bar = 0
         self.all_bars_y = [150, 250, 350, 450]
-        self.end_x_positions = [width - 89, width-90, width-90, width - 91] #TODO: change to be more precise to end of bar
+        self.end_x_positions = [width - 89, width - 90, width - 90,
+                                width - 91]  # TODO: change to be more precise to end of bar
         self.score = 0
 
         self.player_sprite = Player("Tapper_bartender.png", .75, flipped_horizontally=True)
@@ -162,7 +178,7 @@ class RootBeerTapper(arcade.View):
         bar_index = random.randint(0, len(self.all_bars_y) - 1)
         customer = Customer("Tapper_cowboy1.png", 1.5, bar_index, self, flipped_horizontally=False)
         customer.center_x = 50
-        customer.center_y = self.all_bars_y[bar_index] + 65 #places characters right above bar
+        customer.center_y = self.all_bars_y[bar_index] + 65  # places characters right above bar
         self.customer_list.append(customer)
 
     def on_draw(self):
@@ -209,10 +225,10 @@ class RootBeerTapper(arcade.View):
         for y_position in self.all_bars_y:
 
             # TODO: tilt bar parallel to wall
-            arcade.draw_rectangle_filled(width//3, y_position + 25, bar_width, bar_height,    #was width//3
+            arcade.draw_rectangle_filled(width // 3, y_position + 25, bar_width, bar_height,  # was width//3
                                          arcade.color_from_hex_string("#622A0F"))
-            arcade.draw_rectangle_filled(width//3, y_position + 17, bar_width, shadow_height, arcade.color.BLACK)
-            arcade.draw_rectangle_filled(width//3, y_position, bar_width, bar_height,
+            arcade.draw_rectangle_filled(width // 3, y_position + 17, bar_width, shadow_height, arcade.color.BLACK)
+            arcade.draw_rectangle_filled(width // 3, y_position, bar_width, bar_height,
                                          arcade.color_from_hex_string("#923B1B"))
 
             # perpendicular bars underneath
@@ -270,7 +286,6 @@ class RootBeerTapper(arcade.View):
         # lives
         arcade.draw_text(f"Lives: {self.lives}", 10, height - 60, arcade.color.WHITE, 20)
 
-
     def on_update(self, delta_time):
         self.beer_list.update()
         self.customer_list.update()
@@ -279,10 +294,10 @@ class RootBeerTapper(arcade.View):
             customers_hit = arcade.check_for_collision_with_list(beer, self.customer_list)
             for customer in customers_hit:
                 beer.kill()
-                customer.kill()
                 self.score += 1
                 self.window.total_score += 1
-                customer.throw_empty_glass()
+                customer.throw_empty_glass(self.all_bars_y) #added parameter
+                customer.kill()
         for beer in self.beer_list:
             if isinstance(beer, EmptyGlass) and arcade.check_for_collision(beer, self.player_sprite):
                 self.lives -= 1
@@ -312,7 +327,6 @@ class RootBeerTapper(arcade.View):
             game_over_view = GameOverView()
             self.window.show_view(game_over_view)
 
-
     def on_key_press(self, key, modifiers):
         if key == arcade.key.UP and self.current_bar < bars - 1:
             self.current_bar += 1
@@ -320,14 +334,14 @@ class RootBeerTapper(arcade.View):
         elif key == arcade.key.DOWN and self.current_bar > 0:
             self.current_bar -= 1
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
-        elif key == arcade.key.DOWN and self.current_bar == 0:  #added cyclical movement between bars so you can go from bottom to top
+        elif key == arcade.key.DOWN and self.current_bar == 0:  # added cyclical movement between bars so you can go from bottom to top
             self.current_bar = 3
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
-        elif key == arcade.key.UP and self.current_bar == 3:    #and top to bottom
+        elif key == arcade.key.UP and self.current_bar == 3:  # and top to bottom
             self.current_bar = 0
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
         if key == arcade.key.SPACE:
-            beer = Beer("Tapper_mug_full.png", .55)
+            beer = Beer("Tapper_mug_full.png", .55, True)
             beer.center_x = self.player_sprite.center_x - 50
-            beer.center_y = self.player_sprite.center_y + 50    #places beers right on top of bars
+            beer.center_y = self.player_sprite.center_y + 50  # places beers right on top of bars
             self.beer_list.append(beer)
