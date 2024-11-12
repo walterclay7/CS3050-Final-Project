@@ -19,3 +19,6 @@ class Beer(arcade.Sprite):  # changed this class
             self.center_x += beer_speed
             if self.right > WIDTH:
                 self.kill()
+
+    def get_full(self):
+        return self.full
