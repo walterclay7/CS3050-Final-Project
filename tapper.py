@@ -82,8 +82,15 @@ class Tapper(arcade.View):
 
         bar_start_x = WIDTH // 3 - bar_width // 2
 
+        # bottom right
+        x1, y1 = wall_width - tilt_amount, 0
+        # top right
+        x2, y2 = 100, 500
+
+        slope = (y2 - y1) / (x2 - x1)
+
         # add background bars
-        for y_position in self.all_bars_y:
+        for i, y_position in enumerate (self.all_bars_y):
 
             # TODO: tilt bar parallel to wall
             arcade.draw_rectangle_filled(WIDTH // 3, y_position + 25, bar_width, bar_height,  # was width//3
@@ -94,8 +101,8 @@ class Tapper(arcade.View):
 
             # perpendicular bars underneath
 
-            for i in range(perp_rec):
-                rect_x = bar_start_x + i * rect_width + rect_width // 2
+            for j in range(perp_rec):
+                rect_x = bar_start_x + j * rect_width + rect_width // 2
                 rect_y = y_position
 
                 # actually draw them
@@ -124,6 +131,79 @@ class Tapper(arcade.View):
 
         arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color.NAVY_BLUE)
 
+        # left bar door
+        for i, y_position in enumerate(self.all_bars_y):
+            adjusted_wall_width = wall_width + slope * (i + 1)
+            adjusted_bar_height = bar_height - 5
+
+            rect_y = y_position + 5
+
+            triangle_y = y_position + 20 + bar_height
+
+            # bottom of the door
+            arcade.draw_rectangle_filled(adjusted_wall_width - 45, rect_y, 25, adjusted_bar_height,
+                                         arcade.color_from_hex_string("#fe6c01"))
+
+            # right triangle
+            # top left
+            x1, y1 = (adjusted_wall_width - 45) - 12.5, rect_y + adjusted_bar_height / 2 + 20
+            # top right
+            x2, y2 = (adjusted_wall_width - 45) + 12.5, rect_y + adjusted_bar_height / 2
+            # bottom left
+            x3, y3 = (adjusted_wall_width - 45) - 12.5, rect_y + adjusted_bar_height / 2
+
+            arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color_from_hex_string("#fe6c01"))
+
+            # left side of the door
+            arcade.draw_line(
+                # top
+                (adjusted_wall_width - 45) - 12.5,
+                rect_y + adjusted_bar_height / 2 + 20,
+
+                # bottom
+                (adjusted_wall_width - 45) - 12.5,
+                rect_y + adjusted_bar_height / 2 - 40,
+                arcade.color.GOLD,
+                line_width = 2
+            )
+
+
+        # right bar door
+        for i, y_position in enumerate(self.all_bars_y):
+            adjusted_wall_width = wall_width + slope * (i + 1) - 25
+            adjusted_bar_height = bar_height - 15
+
+            rect_y = y_position + 50
+
+            triangle_y = y_position + 20 + bar_height
+
+            # bottom of the door
+            arcade.draw_rectangle_filled(adjusted_wall_width, rect_y, 25, adjusted_bar_height,
+                                         arcade.color_from_hex_string("#fe6c01"))
+
+            # right triangle
+            # top left
+            x1, y1 = (adjusted_wall_width) - 12.5, rect_y + adjusted_bar_height / 2 + 20
+            # top right
+            x2, y2 = (adjusted_wall_width) + 12.5, rect_y + adjusted_bar_height / 2
+            # bottom left
+            x3, y3 = (adjusted_wall_width) - 12.5, rect_y + adjusted_bar_height / 2
+
+            arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color_from_hex_string("#fe6c01"))
+
+            # connect the top of the doors
+            arcade.draw_line(
+                # top right
+                (adjusted_wall_width) - 12.5,
+                rect_y + adjusted_bar_height / 2 + 20,
+
+                # bottom left
+                (adjusted_wall_width - 45) + 12.5,
+                rect_y + adjusted_bar_height / 2 - 20,
+                arcade.color.GOLD,
+                line_width = 2
+            )
+
         # budweiser sign
         points = [
             (385, 575),  # top center **
@@ -146,6 +226,31 @@ class Tapper(arcade.View):
 
         # lives
         arcade.draw_text(f"Lives: {self.lives}", 10, HEIGHT - 60, arcade.color.WHITE, 20)
+
+
+
+        # left side of the right wall
+        x3, y3 = WIDTH - wall_width, HEIGHT - 100
+        x4, y4 = WIDTH - wall_width + tilt_amount, 0
+
+        # calc the slope of the line
+        slope = (y4 - y3) / (x4 - x3)
+
+        # space between taps
+        keg_spacing = 70
+        keg_width = 30
+        keg_height = 30
+        y_offset = 20
+
+        # draw all 4 taps
+        for i, y_position in enumerate(self.all_bars_y[:4]):
+            adjusted_y_position = y_position + y_offset
+            # find x-coordinate so that its parallel to the left side of the right wall
+            keg_x = x3 + (adjusted_y_position - y3) / slope + 30
+
+            # draw the tap
+            arcade.draw_rectangle_filled(keg_x, adjusted_y_position, keg_width, keg_height,
+                                         arcade.color.PINK, tilt_amount)
 
     def on_update(self, delta_time):
         from view import GameOverView
