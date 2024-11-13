@@ -19,13 +19,14 @@ class Tapper(arcade.View):
         self.player_sprite = None
         self.beer_list = None
         self.customer_list = None
+
         self.current_bar = 0
         self.all_bars_y = [150, 250, 350, 450]
         self.end_x_positions = [WIDTH - 89, WIDTH - 90, WIDTH - 90,
                                 WIDTH - 91]  # TODO: change to be more precise to end of bar
         self.score = 0
 
-        self.player_sprite = Player("images/Tapper_bartender.png", .75, flipped_horizontally=True)
+        self.player_sprite = Player("images/Tapper_bartender.png", .75, moving_left=False, moving_right=False, flipped_horizontally=True)
         self.player_sprite.center_x = WIDTH - 100
         self.player_sprite.center_y = self.all_bars_y[self.current_bar]
         self.beer_list = arcade.SpriteList()
@@ -253,7 +254,9 @@ class Tapper(arcade.View):
                                          arcade.color.PINK, tilt_amount)
 
     def on_update(self, delta_time):
-        from view import GameOverView
+        from view import GameOverView   # to avoid cyclical imports - could not find a way around this
+
+        self.player_sprite.update()
         self.beer_list.update()
         self.customer_list.update()
 
@@ -266,49 +269,87 @@ class Tapper(arcade.View):
                 customer.throw_empty_glass(self.all_bars_y)  # added parameter
                 customer.kill()
         for beer in self.beer_list:
+            #if player catches empty beer as it is sliding back
             if isinstance(beer, Beer) and arcade.check_for_collision(beer, self.player_sprite):
-                self.lives -= 1
                 beer.kill()
+                # lives run out = game over
                 if self.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
-
+            #If empty beer reaches end of bar without getting caught
             if beer.right >= WIDTH - 100:
                 self.lives -= 1
                 beer.kill()
-
+                # lives run out = game over
                 if self.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
-
+            # if full beer reaches end door without hitting customer
+            if beer.right <= 90:
+                self.lives -= 1
+                beer.kill()
+                # lives run out = game over
+                if self.lives <= 0:
+                    game_over_view = GameOverView()
+                    self.window.show_view(game_over_view)
+        #check all customers to make sure they do not get to end of bar before being served
         for customer in self.customer_list:
             bar_end_x = self.end_x_positions[customer.bar_index]
             if customer.center_x >= bar_end_x:
                 customer.kill()
                 self.lives -= 1
+                #lives run out = game over
                 if self.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
-
-        if self.score == 3:
+        #if score is reached
+        if self.score == 5:
             game_over_view = GameOverView()
             self.window.show_view(game_over_view)
 
     def on_key_press(self, key, modifiers):
+        # Move up and down between bars including cyclical movement
         if key == arcade.key.UP and self.current_bar < bars - 1:
             self.current_bar += 1
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
+            self.player_sprite.center_x = WIDTH - 100
         elif key == arcade.key.DOWN and self.current_bar > 0:
             self.current_bar -= 1
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
+            self.player_sprite.center_x = WIDTH - 100
         elif key == arcade.key.DOWN and self.current_bar == 0:
             self.current_bar = 3
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
+            self.player_sprite.center_x = WIDTH - 100
         elif key == arcade.key.UP and self.current_bar == 3:  # and top to bottom
             self.current_bar = 0
             self.player_sprite.center_y = self.all_bars_y[self.current_bar]
+            self.player_sprite.center_x = WIDTH - 100
+
+        # Move left and right down bars
+        if key == arcade.key.LEFT:
+            self.player_sprite.set_moving_left(True)
+        elif key == arcade.key.RIGHT:
+            self.player_sprite.set_moving_right(True)
+
+        # Launch beers on press
         if key == arcade.key.SPACE:
+
+            # set player back to keg side of bar
+            self.player_sprite.center_x = WIDTH - 100
+
             beer = Beer("images/Tapper_mug_full.png", .55, True)
             beer.center_x = self.player_sprite.center_x - 50
             beer.center_y = self.player_sprite.center_y + 50  # places beers right on top of bars
+
+
+
             self.beer_list.append(beer)
+
+    def on_key_release(self, key, modifiers):
+        # release means stop movement - horizontal
+        if key == arcade.key.LEFT:
+            self.player_sprite.set_moving_left(False)
+        elif key == arcade.key.RIGHT:
+            self.player_sprite.set_moving_right(False)
+
