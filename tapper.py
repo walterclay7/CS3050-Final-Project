@@ -3,6 +3,7 @@ import random
 from beer import Beer
 from customer import Customer
 from player import Player
+import math
 
 # I import gameOverView from view.py below in the code block shortly before I call game over view
 
@@ -10,7 +11,19 @@ from player import Player
 WIDTH = 800
 HEIGHT = 600
 bars = 4
+radius = 25
 
+
+def calc_hexagon(center_x_coord, center_y_coord, radius):
+    # def
+    vertices = []
+    for i in range(6):
+        angle = math.radians(60 * i + 45) + 20
+        # cos is x axis, sin is y axis
+        x = center_x_coord + radius * math.cos(angle)
+        y = center_y_coord + radius * math.sin(angle - 10)
+        vertices.append((x, y))
+    return vertices
 
 class Tapper(arcade.View):
     def __init__(self):
@@ -248,10 +261,47 @@ class Tapper(arcade.View):
             adjusted_y_position = y_position + y_offset
             # find x-coordinate so that its parallel to the left side of the right wall
             keg_x = x3 + (adjusted_y_position - y3) / slope + 30
+            hexagon_vertices = calc_hexagon(keg_x, adjusted_y_position, radius)
+            small_hexagon_vertices = calc_hexagon(keg_x-5, adjusted_y_position, radius-10)
 
-            # draw the tap
-            arcade.draw_rectangle_filled(keg_x, adjusted_y_position, keg_width, keg_height,
-                                         arcade.color.PINK, tilt_amount)
+            # draw the tap, larger
+            arcade.draw_polygon_filled(hexagon_vertices, arcade.color_from_hex_string("#982204"))
+            arcade.draw_polygon_outline(hexagon_vertices, arcade.color_from_hex_string("#4e2200"), 2)
+
+            # smaller
+            arcade.draw_polygon_filled(small_hexagon_vertices, arcade.color_from_hex_string("#722500"))
+            arcade.draw_polygon_outline(small_hexagon_vertices, arcade.color_from_hex_string("#d1970f"), 2)
+
+            # extrusion
+            arcade.draw_line(
+                # right
+                keg_x - 5,adjusted_y_position,
+
+                # left
+                keg_x - 35,adjusted_y_position,
+                arcade.color_from_hex_string("#6c6b70"),
+                line_width = 5
+            )
+
+            # part where the liquid comes out
+            arcade.draw_line(keg_x - 35, adjusted_y_position,
+                             keg_x - 35, adjusted_y_position - 10,
+                             arcade.color_from_hex_string("#6c6b70"),
+                             line_width = 3)
+
+            # handle outline
+            arcade.draw_line(keg_x - 35, adjusted_y_position,
+                             keg_x - 35, adjusted_y_position + 22,
+                             arcade.color.BLACK,
+                             line_width=7)
+
+            # handle
+            arcade.draw_line(keg_x - 35, adjusted_y_position,
+                             keg_x - 35, adjusted_y_position + 20,
+                             arcade.color_from_hex_string("#653733"),
+                             line_width=5)
+
+
 
     def on_update(self, delta_time):
         from view import GameOverView   # to avoid cyclical imports - could not find a way around this
