@@ -15,6 +15,7 @@ class RatGame(arcade.Window):
         self.rat= None
         self.untouched_cup= None
         self.guy = None
+        self.correct=False
         #keep track of stuff...
         self.current_touch_index=0
         self.is_shuffling= False
@@ -77,7 +78,7 @@ class RatGame(arcade.Window):
         cup2.target_x = cup1.center_x
         cup2.target_y = cup1.center_y
 
-        speed = 6
+        speed = 7
         cup1.change_x = (cup1.target_x-cup1.center_x)/ speed
         cup1.change_y = (cup1.target_y-cup1.center_y)/ speed
         cup2.change_x = (cup2.target_x-cup2.center_x)/ speed
@@ -106,17 +107,24 @@ class RatGame(arcade.Window):
                 self.guy.center_x -= 100
             elif symbol == arcade.key.ENTER:
                 if abs(self.guy.center_x - self.untouched_cup.center_x) < 50:
-                    print("Correct! You guessed the untouched cup.")
+                    print("Correct! You guessed the right cup.")
+                    self.correct=True
                 else:
                     print("Wrong! Try again.")
 
     def on_draw(self):
         arcade.start_render()
+        arcade.draw_rectangle_filled(WIDTH // 2, HEIGHT // 2, WIDTH, HEIGHT, arcade.color.BLUE)
+        if self.guy:
+            self.guy.draw()
+        if self.rat:
+            self.rat.draw()
+        arcade.draw_rectangle_filled(WIDTH // 2, HEIGHT // 4, WIDTH, 300, arcade.color.BRONZE)
+
         self.cup_list.draw()
         if self.rat:
             self.rat.draw()
-        if self.guy:
-            self.guy.draw()
+
 
 
 
