@@ -120,6 +120,20 @@ class RatGame(arcade.Window):
         if self.rat:
             self.rat.draw()
         arcade.draw_rectangle_filled(WIDTH // 2, HEIGHT // 4, WIDTH, 300, arcade.color.BRONZE)
+        #ninas budweiser sign
+        tpoints = [
+            (385, 575),  # top center **
+            (500, 600),  # top right
+            (500, 500),  # bottom right
+            (385, 530),  # bottom center **
+            (300, 500),  # bottom left
+            (300, 600)  # top left
+        ]
+
+        arcade.draw_polygon_filled(tpoints, arcade.color.RED)
+
+        arcade.draw_text("Budweiser", WIDTH / 2, HEIGHT - 55,
+                         arcade.color.WHITE, font_size=20, anchor_x="center")
 
         self.cup_list.draw()
         if self.rat:
