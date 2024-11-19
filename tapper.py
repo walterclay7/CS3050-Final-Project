@@ -5,7 +5,7 @@ from customer import Customer
 from player import Player
 import math
 
-# I import gameOverView from view.py below in the code block shortly before I call game over view
+# I import gameOverView and RoundWinView from view.py below in the code block shortly before I call game over view
 
 # variables for MenuView
 WIDTH = 800
@@ -25,36 +25,72 @@ def calc_hexagon(center_x_coord, center_y_coord, radius):
         vertices.append((x, y))
     return vertices
 
+
 class Tapper(arcade.View):
     def __init__(self):
         super().__init__()
         self.lives = 3
+        self.round = 1
         self.player_sprite = None
         self.beer_list = None
         self.customer_list = None
+
+
 
         self.current_bar = 0
         self.all_bars_y = [150, 250, 350, 450]
         self.end_x_positions = [WIDTH - 89, WIDTH - 90, WIDTH - 90,
                                 WIDTH - 91]  # TODO: change to be more precise to end of bar
+        self.start_x_positions = [91, 90, 90, 89]
         self.score = 0
 
-        self.player_sprite = Player("images/Tapper_bartender.png", .75, moving_left=False, moving_right=False, flipped_horizontally=True)
+        self.player_sprite = Player("images/Tapper_bartender.png", .75, moving_left=False, moving_right=False,
+                                    flipped_horizontally=True)
         self.player_sprite.center_x = WIDTH - 100
         self.player_sprite.center_y = self.all_bars_y[self.current_bar]
         self.beer_list = arcade.SpriteList()
         self.customer_list = arcade.SpriteList()
+
+        self.patron_count = {i: 0 for i in range(len(self.all_bars_y))}  # Track patrons per bar
+
+        self.initial_wave_spawned = False
+
+        # Spawn initial wave of customers
+        self.spawn_initial_wave()
+        self.initial_wave_spawned = True
+
         arcade.schedule(self.add_customer, 2)
+
+
 
     def on_show_view(self):
         arcade.set_background_color(arcade.color_from_hex_string("#454545"))
 
+    def spawn_initial_wave(self):
+        """Spawns a wave of customers at the beginning of a round."""
+        for _ in range(5):  # Change this number for the size of the wave
+            bar_index = random.randint(0, len(self.all_bars_y) - 1)
+
+            if self.round == 1 and self.patron_count[bar_index] >= 2:
+                continue
+
+            customer = Customer("images/Tapper_cowboy1.png", 1.5, bar_index, self, flipped_horizontally=False)
+            customer.center_x = 50
+            customer.center_y = self.all_bars_y[bar_index] + 65  # Place customers right above the bar
+            self.customer_list.append(customer)
+            self.patron_count[bar_index] += 1
+
     def add_customer(self, delta_time: float):
         bar_index = random.randint(0, len(self.all_bars_y) - 1)
+        # Ensure max 2 patrons per bar in round 1
+        if self.round == 1 and self.patron_count[bar_index] >= 2:
+            return
+
         customer = Customer("images/Tapper_cowboy1.png", 1.5, bar_index, self, flipped_horizontally=False)
         customer.center_x = 50
         customer.center_y = self.all_bars_y[bar_index] + 65  # places characters right above bar
         self.customer_list.append(customer)
+        self.patron_count[bar_index] += 1
 
     def on_draw(self):
         arcade.start_render()
@@ -301,34 +337,61 @@ class Tapper(arcade.View):
                              arcade.color_from_hex_string("#653733"),
                              line_width=5)
 
+    def reset_round(self):
+        """Resets the round when a life is lost or a round is won."""
+        # Clear existing beer and customer sprites
+        self.beer_list = arcade.SpriteList()
+        self.customer_list = arcade.SpriteList()
 
+        # Reset patron counts
+        self.patron_count = {i: 0 for i in range(len(self.all_bars_y))}
+
+        # Reset player position
+        self.player_sprite.center_x = WIDTH - 100
+        self.player_sprite.center_y = self.all_bars_y[self.current_bar]
+
+        # Stop and restart customer spawning
+        arcade.unschedule(self.add_customer)
+        self.initial_wave_spawned = False  # Reset for the new round
+
+        # Spawn initial wave of customers for the next round
+        self.spawn_initial_wave()
+        self.initial_wave_spawned = True
+
+        # Resume regular customer spawning
+        arcade.schedule(self.add_customer, max(1, 2 - self.round * 0.1))
 
     def on_update(self, delta_time):
-        from view import GameOverView   # to avoid cyclical imports - could not find a way around this
+        from view import GameOverView, RoundWinView  # to avoid cyclical imports - could not find a way around this
 
         self.player_sprite.update()
         self.beer_list.update()
-        self.customer_list.update()
+        for customer in self.customer_list:
+            customer.update()
 
         for beer in self.beer_list:
-            customers_hit = arcade.check_for_collision_with_list(beer, self.customer_list)
-            for customer in customers_hit:
-                beer.kill()
-                self.score += 1
-                self.window.total_score += 1
-                customer.throw_empty_glass(self.all_bars_y)  # added parameter
-                customer.kill()
+            if beer.get_full() == True:
+                customers_hit = arcade.check_for_collision_with_list(beer, self.customer_list)
+                for customer in customers_hit:
+                    beer.kill()
+                    self.score += 1
+                    self.window.total_score += 1
+                    customer.hit_customer(
+                        self.all_bars_y)  # pushes back customer and then throws glass or kills customer
+
         for beer in self.beer_list:
-            #if player catches empty beer as it is sliding back
+            # if player catches empty beer as it is sliding back
             if isinstance(beer, Beer) and arcade.check_for_collision(beer, self.player_sprite):
                 beer.kill()
                 # lives run out = game over
                 if self.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
-            #If empty beer reaches end of bar without getting caught
+            # If empty beer reaches end of bar without getting caught
             if beer.right >= WIDTH - 100:
                 self.lives -= 1
+                # reset round
+                self.reset_round()
                 beer.kill()
                 # lives run out = game over
                 if self.lives <= 0:
@@ -337,25 +400,36 @@ class Tapper(arcade.View):
             # if full beer reaches end door without hitting customer
             if beer.right <= 90:
                 self.lives -= 1
+                # reset round
+                self.reset_round()
                 beer.kill()
                 # lives run out = game over
                 if self.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
-        #check all customers to make sure they do not get to end of bar before being served
+        # check all customers to make sure they do not get to end of bar before being served
         for customer in self.customer_list:
             bar_end_x = self.end_x_positions[customer.bar_index]
+            bar_start_x = self.start_x_positions[customer.bar_index]
             if customer.center_x >= bar_end_x:
                 customer.kill()
                 self.lives -= 1
-                #lives run out = game over
+                # reset round
+                self.reset_round()
+                # lives run out = game over
                 if self.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
-        #if score is reached
-        if self.score == 5:
-            game_over_view = GameOverView()
-            self.window.show_view(game_over_view)
+            # checks whether customer hit back wall and kills it if it gets pushed back enough
+            if customer.get_drinking() and customer.center_x <= bar_start_x:
+                customer.kill()
+                self.score += 1
+                self.window.total_score += 1
+
+        # Check if all customers are gone and win the round
+        if len(self.customer_list) == 0:
+            round_win_view = RoundWinView(self.round)  # Pass the current round number
+            self.window.show_view(round_win_view)
 
     def on_key_press(self, key, modifiers):
         # Move up and down between bars including cyclical movement
@@ -384,15 +458,12 @@ class Tapper(arcade.View):
 
         # Launch beers on press
         if key == arcade.key.SPACE:
-
             # set player back to keg side of bar
             self.player_sprite.center_x = WIDTH - 100
 
             beer = Beer("images/Tapper_mug_full.png", .55, True)
             beer.center_x = self.player_sprite.center_x - 50
             beer.center_y = self.player_sprite.center_y + 50  # places beers right on top of bars
-
-
 
             self.beer_list.append(beer)
 
@@ -402,4 +473,3 @@ class Tapper(arcade.View):
             self.player_sprite.set_moving_left(False)
         elif key == arcade.key.RIGHT:
             self.player_sprite.set_moving_right(False)
-
