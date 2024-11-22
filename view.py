@@ -61,3 +61,26 @@ class GameOverView(arcade.View):
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         game_view = Tapper()
         self.window.show_view(game_view)
+
+
+class RoundWinView(arcade.View):
+    def __init__(self, round_number):
+        super().__init__()
+        self.round_number = round_number
+
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color_from_hex_string("#FFD700"))  # Gold background for a win
+
+    def on_draw(self):
+        self.clear()
+        arcade.draw_text(f"Round {self.round_number} Complete!", WIDTH / 2, HEIGHT / 2 + 50,
+                         arcade.color.BLACK, font_size=40, anchor_x="center")
+        arcade.draw_text("Click to start the next round", WIDTH / 2, HEIGHT / 2 - 50,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        # Transition back to the game view
+        game_view = Tapper()
+        game_view.round = self.round_number + 1  # Increment the round
+        game_view.reset_round()  # Reset for the next round
+        self.window.show_view(game_view)
