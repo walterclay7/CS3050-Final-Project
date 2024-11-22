@@ -55,7 +55,7 @@ class RatGame(arcade.Window):
         self.is_shuffling = True
         self.shuffle_time=0.0
         self.rat.visible=False
-        arcade.schedule(self.shuffle_cups, 0.2)
+        arcade.schedule(self.shuffle_cups, 0.3)
 
 
 
