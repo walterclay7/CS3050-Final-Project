@@ -4,6 +4,7 @@ from beer import Beer
 from customer import Customer
 from player import Player
 import math
+from ratCups import RatGame
 
 # I import gameOverView and RoundWinView from view.py below in the code block shortly before I call game over view
 
@@ -34,6 +35,7 @@ class Tapper(arcade.View):
         self.player_sprite = None
         self.beer_list = None
         self.customer_list = None
+        self.rat_view = None
 
 
 

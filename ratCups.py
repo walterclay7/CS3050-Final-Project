@@ -1,16 +1,16 @@
-from typing import Tuple
-
 import arcade
 import random
-import math
+
 
 WIDTH = 800
 HEIGHT = 600
 num_cups = 6
 
-class RatGame(arcade.Window):
-    def __init__(self):
-        super().__init__(WIDTH, HEIGHT, 'Rat Bonus Round')
+class RatGame(arcade.View):
+    def __init__(self,score,round):
+        super().__init__()
+        self.score = score
+        self.round = round
         self.cup_list=arcade.SpriteList()
         self.rat= None
         self.untouched_cup= None
@@ -109,8 +109,14 @@ class RatGame(arcade.Window):
                 if abs(self.guy.center_x - self.untouched_cup.center_x) < 50:
                     print("Correct! You guessed the right cup.")
                     self.correct=True
-                else:
-                    print("Wrong! Try again.")
+                    self.score+=10
+                self.end_game()
+    def end_game(self):
+        from tapper import Tapper
+        tapper_view=Tapper()
+        tapper_view.score=self.score
+        tapper_view.round=self.round+1
+        self.window.show_view(tapper_view)
 
     def on_draw(self):
         arcade.start_render()
@@ -139,10 +145,10 @@ class RatGame(arcade.Window):
         if self.rat:
             self.rat.draw()
 
+    def reset(self):
+        arcade.unschedule(self.touch_next_cup)
+        arcade.unschedule(self.shuffle_cups)
+        self.setup()
 
 
-
-game = RatGame()
-game.setup()
-arcade.run()
 

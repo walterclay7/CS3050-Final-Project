@@ -1,5 +1,6 @@
 import arcade
 from tapper import Tapper
+from ratCups import RatGame
 
 # variables for MenuView
 WIDTH = 800
@@ -83,4 +84,10 @@ class RoundWinView(arcade.View):
         game_view = Tapper()
         game_view.round = self.round_number + 1  # Increment the round
         game_view.reset_round()  # Reset for the next round
-        self.window.show_view(game_view)
+        #after round 2 bring up rat round
+        if game_view.round==3:
+            rat_game = RatGame(game_view.score,self.round_number)
+            rat_game.setup()
+            self.window.show_view(rat_game)
+        else:
+            self.window.show_view(game_view)
