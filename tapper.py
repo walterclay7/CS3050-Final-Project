@@ -380,6 +380,8 @@ class Tapper(arcade.View):
                     self.window.total_score += 1
                     customer.hit_customer(
                         self.all_bars_y)  # pushes back customer and then throws glass or kills customer
+                    customer.texture = arcade.load_texture("images/tapper_cowboy_drinking_part1.png")
+
 
         for beer in self.beer_list:
             # if player catches empty beer as it is sliding back
