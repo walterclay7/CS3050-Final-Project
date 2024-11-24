@@ -59,11 +59,13 @@ class Customer(arcade.Sprite):
             return  # Do nothing else while moving to the target
 
         if self.drinking:
+            self.texture = arcade.load_texture("images/tapper_cowboy_drinking_part2.png")
             # Handle drinking
             self.drink_timer -= 1
             if self.drink_timer <= 0:
                 self.drinking = False  # Resume movement after drinking
                 self.throw_empty_beer_glass()
+                self.texture = arcade.load_texture("images/tapper_cowboy1.png")
             return  # Do nothing else while drinking
 
         # Normal forward movement when not drinking or moving backward
