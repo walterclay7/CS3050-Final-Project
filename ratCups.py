@@ -22,11 +22,12 @@ class RatGame(arcade.View):
         self.touch_order = []
         self.shuffle_time = 0.0
         self.steps=[]
+        self.result_message=""
 
 
     def setup(self):
         for i in range(num_cups):
-            cup = arcade.Sprite('images/cup_image.jpg', 0.2)
+            cup = arcade.Sprite('images/Tapper_mug_full.png', 1)
             cup.center_x = 100 + i * 100
             cup.center_y = HEIGHT // 2
             cup.target_x = cup.center_x
@@ -37,7 +38,7 @@ class RatGame(arcade.View):
         self.untouched_cup = random.choice(self.cup_list)
         self.touch_order = [cup for cup in self.cup_list if cup != self.untouched_cup]
         random.shuffle(self.touch_order)
-        arcade.schedule(self.touch_next_cup, 0.5)
+        arcade.schedule(self.touch_next_cup, 0.6)
 
     def touch_next_cup(self, dt):
         if self.current_touch_index >= len(self.touch_order):
@@ -55,7 +56,7 @@ class RatGame(arcade.View):
         self.is_shuffling = True
         self.shuffle_time=0.0
         self.rat.visible=False
-        arcade.schedule(self.shuffle_cups, 0.3)
+        arcade.schedule(self.shuffle_cups, 0.4)
 
 
 
@@ -108,10 +109,22 @@ class RatGame(arcade.View):
             elif symbol == arcade.key.ENTER:
                 if abs(self.guy.center_x - self.untouched_cup.center_x) < 50:
                     print("Correct! You guessed the right cup.")
+                    self.result_message='Correct'
                     self.correct=True
                     self.score+=10
-                self.end_game()
+                else:
+                    self.result_message='Wrong Guess!'
+                    for cup in self.cup_list:
+                        cup.texture = arcade.load_texture('images/Tapper_mug_empty.png')
+                #self.end_game()
+            arcade.schedule(self.show_result, 2)
+    def show_result(self, dt):
+        arcade.unschedule(self.show_result)
+        self.end_game()
+
+
     def end_game(self):
+        #had to import here i fear
         from tapper import Tapper
         tapper_view=Tapper()
         tapper_view.score=self.score
@@ -123,8 +136,6 @@ class RatGame(arcade.View):
         arcade.draw_rectangle_filled(WIDTH // 2, HEIGHT // 2, WIDTH, HEIGHT, arcade.color.BLUE)
         if self.guy:
             self.guy.draw()
-        if self.rat:
-            self.rat.draw()
         arcade.draw_rectangle_filled(WIDTH // 2, HEIGHT // 4, WIDTH, 300, arcade.color.BRONZE)
         #ninas budweiser sign
         tpoints = [
@@ -144,6 +155,15 @@ class RatGame(arcade.View):
         self.cup_list.draw()
         if self.rat:
             self.rat.draw()
+        if self.result_message:
+            arcade.draw_text(
+                self.result_message,
+                WIDTH / 2,
+                HEIGHT -200,
+                arcade.color.WHITE,
+                font_size=30,
+                anchor_x="center"
+            )
 
     def reset(self):
         arcade.unschedule(self.touch_next_cup)
