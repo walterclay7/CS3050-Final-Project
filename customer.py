@@ -49,8 +49,7 @@ class Customer(arcade.Sprite):
                 if self.target_x == self.game_view.start_x_positions[self.bar_index]:
                     # If the target was the door, remove the customer
                     self.kill()
-                    self.game_view.score += 1
-                    self.game_view.window.total_score += 1
+                    self.game_view.window.total_score += 50
                 # Reached target position
                 self.target_x = None
                 # If not at the door, start drinking
