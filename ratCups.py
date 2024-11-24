@@ -129,7 +129,6 @@ class RatGame(arcade.View):
         #had to import here i fear
         from tapper import Tapper
         tapper_view = Tapper()
-        #tapper_view.score += self.score
         self.window.total_score += self.score
         tapper_view.round = self.round+1
         self.window.show_view(tapper_view)
