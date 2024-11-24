@@ -56,7 +56,7 @@ class RatGame(arcade.View):
         self.is_shuffling = True
         self.shuffle_time=0.0
         self.rat.visible=False
-        arcade.schedule(self.shuffle_cups, 0.4)
+        arcade.schedule(self.shuffle_cups, 0.5)
 
 
 
@@ -117,10 +117,12 @@ class RatGame(arcade.View):
                     for cup in self.cup_list:
                         cup.texture = arcade.load_texture('images/Tapper_mug_empty.png')
                 #self.end_game()
-            arcade.schedule(self.show_result, 2)
+                arcade.schedule(self.show_result, 2)
+
     def show_result(self, dt):
         arcade.unschedule(self.show_result)
-        self.end_game()
+        if self.result_message:
+            self.end_game()
 
 
     def end_game(self):
