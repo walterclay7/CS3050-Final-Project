@@ -109,9 +109,9 @@ class RatGame(arcade.View):
             elif symbol == arcade.key.ENTER:
                 if abs(self.guy.center_x - self.untouched_cup.center_x) < 50:
                     print("Correct! You guessed the right cup.")
-                    self.result_message='Correct'
+                    self.result_message = 'Correct'
                     self.correct=True
-                    self.score+=10
+                    self.score+=3000
                 else:
                     self.result_message='Wrong Guess!'
                     for cup in self.cup_list:
@@ -128,9 +128,10 @@ class RatGame(arcade.View):
     def end_game(self):
         #had to import here i fear
         from tapper import Tapper
-        tapper_view=Tapper()
-        tapper_view.score=self.score
-        tapper_view.round=self.round+1
+        tapper_view = Tapper()
+        #tapper_view.score += self.score
+        self.window.total_score += self.score
+        tapper_view.round = self.round+1
         self.window.show_view(tapper_view)
 
     def on_draw(self):

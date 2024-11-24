@@ -274,7 +274,7 @@ class Tapper(arcade.View):
         self.player_sprite.draw()
         self.beer_list.draw()
         self.customer_list.draw()
-        arcade.draw_text(f"Score: {self.score}", 10, HEIGHT - 30, arcade.color.WHITE, 20)
+        arcade.draw_text(f"Score: {self.window.total_score}", 10, HEIGHT - 30, arcade.color.WHITE, 20)
 
         # lives
         arcade.draw_text(f"Lives: {self.lives}", 10, HEIGHT - 60, arcade.color.WHITE, 20)
@@ -371,13 +371,12 @@ class Tapper(arcade.View):
         for customer in self.customer_list:
             customer.update()
 
+        #This is for when the customer gets hit by a full beer - initiates push back and drinking feature
         for beer in self.beer_list:
             if beer.get_full() == True:
                 customers_hit = arcade.check_for_collision_with_list(beer, self.customer_list)
                 for customer in customers_hit:
                     beer.kill()
-                    self.score += 1
-                    self.window.total_score += 1
                     customer.hit_customer(
                         self.all_bars_y)  # pushes back customer and then throws glass or kills customer
                     customer.texture = arcade.load_texture("images/tapper_cowboy_drinking_part1.png")
@@ -386,6 +385,7 @@ class Tapper(arcade.View):
         for beer in self.beer_list:
             # if player catches empty beer as it is sliding back
             if isinstance(beer, Beer) and arcade.check_for_collision(beer, self.player_sprite):
+                self.window.total_score += 100
                 beer.kill()
                 # lives run out = game over
                 if self.lives <= 0:
@@ -427,13 +427,12 @@ class Tapper(arcade.View):
             # checks whether customer hit back wall and kills it if it gets pushed back enough
             if customer.get_drinking() and customer.center_x <= bar_start_x:
                 customer.kill()
-                self.score += 1
-                self.window.total_score += 1
 
         # Check if all customers are gone and win the round
         if len(self.customer_list) == 0:
             round_win_view = RoundWinView(self.round)  # Pass the current round number
             self.window.show_view(round_win_view)
+            self.window.total_score += 1000
 
     def on_key_press(self, key, modifiers):
         # Move up and down between bars including cyclical movement
