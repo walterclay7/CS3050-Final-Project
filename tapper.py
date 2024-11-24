@@ -26,7 +26,6 @@ def calc_hexagon(center_x_coord, center_y_coord, radius):
         vertices.append((x, y))
     return vertices
 
-
 class Tapper(arcade.View):
     def __init__(self):
         super().__init__()
@@ -196,15 +195,28 @@ class Tapper(arcade.View):
             arcade.draw_rectangle_filled(adjusted_wall_width - 45, rect_y, 25, adjusted_bar_height,
                                          arcade.color_from_hex_string("#fe6c01"))
 
+            # shadow
+            arcade.draw_rectangle_filled(adjusted_wall_width - 45, rect_y, 18, adjusted_bar_height - 6,
+                                         arcade.color_from_hex_string("#db4504"))
+
+
             # right triangle
             # top left
             x1, y1 = (adjusted_wall_width - 45) - 12.5, rect_y + adjusted_bar_height / 2 + 20
-            # top right
+            # bottom right
             x2, y2 = (adjusted_wall_width - 45) + 12.5, rect_y + adjusted_bar_height / 2
             # bottom left
             x3, y3 = (adjusted_wall_width - 45) - 12.5, rect_y + adjusted_bar_height / 2
 
             arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color_from_hex_string("#fe6c01"))
+
+            # top left
+            x1, y1 = (adjusted_wall_width - 44) - 10.5, rect_y - 6 + adjusted_bar_height / 2 + 20
+            # bottom right
+            x2, y2 = (adjusted_wall_width - 44) + 5.5, rect_y + 1 + adjusted_bar_height / 2
+            # bottom left
+            x3, y3 = (adjusted_wall_width - 44) - 10.5, rect_y + 1 + adjusted_bar_height / 2
+            arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color_from_hex_string("#db4504"))
 
             # left side of the door
             arcade.draw_line(
@@ -233,15 +245,27 @@ class Tapper(arcade.View):
             arcade.draw_rectangle_filled(adjusted_wall_width, rect_y, 25, adjusted_bar_height,
                                          arcade.color_from_hex_string("#fe6c01"))
 
+            # shadow
+            arcade.draw_rectangle_filled(adjusted_wall_width, rect_y, 20, adjusted_bar_height - 6,
+                                         arcade.color_from_hex_string("#db4504"))
+
             # right triangle
             # top left
             x1, y1 = (adjusted_wall_width) - 12.5, rect_y + adjusted_bar_height / 2 + 20
-            # top right
+            # bottom right
             x2, y2 = (adjusted_wall_width) + 12.5, rect_y + adjusted_bar_height / 2
             # bottom left
             x3, y3 = (adjusted_wall_width) - 12.5, rect_y + adjusted_bar_height / 2
 
             arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color_from_hex_string("#fe6c01"))
+
+            # top left
+            x1, y1 = (adjusted_wall_width) - 10.5, rect_y - 6 + adjusted_bar_height / 2 + 20
+            # bottom right
+            x2, y2 = (adjusted_wall_width) + 8.5, rect_y + 1 + adjusted_bar_height / 2
+            # bottom left
+            x3, y3 = (adjusted_wall_width) - 10.5, rect_y + 1 + adjusted_bar_height / 2
+            arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color_from_hex_string("#db4504"))
 
             # connect the top of the doors
             arcade.draw_line(
@@ -266,10 +290,22 @@ class Tapper(arcade.View):
             (300, 600)  # top left
         ]
 
+        arcade.draw_polygon_filled(points, arcade.color_from_hex_string("#fe6c01"))
+
+        # outline budweiser sign
+        points = [
+            (385, 572),  # top center **
+            (498, 598),  # top right
+            (498, 502),  # bottom right
+            (385, 532),  # bottom center **
+            (302, 502),  # bottom left
+            (302, 598)  # top left
+        ]
+
         arcade.draw_polygon_filled(points, arcade.color.RED)
 
         arcade.draw_text("Budweiser", WIDTH / 2, HEIGHT - 55,
-                         arcade.color.WHITE, font_size=20, anchor_x="center")
+                         arcade.color.WHITE, font_size=20, anchor_x="center", bold=True)
 
         self.player_sprite.draw()
         self.beer_list.draw()
