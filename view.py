@@ -29,9 +29,11 @@ class InstructionView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Move using the up and down arrows.", WIDTH / 2, HEIGHT / 2 + 15,
+        arcade.draw_text("Instructions: ", WIDTH / 2, HEIGHT / 2 + 40,
                          arcade.color.BLACK, font_size=20, anchor_x="center", multiline=True)
-        arcade.draw_text("Use the space bar to serve the drinks", WIDTH / 2, HEIGHT / 2 - 15,
+        arcade.draw_text("Move using the up and down arrows.", WIDTH / 2, HEIGHT / 2 + 10,
+                         arcade.color.BLACK, font_size=20, anchor_x="center", multiline=True)
+        arcade.draw_text("Use the space bar to serve the drinks", WIDTH / 2, HEIGHT / 2 - 20,
                          arcade.color.BLACK, font_size=20, anchor_x="center", multiline=True)
         arcade.draw_text("Click to advance", WIDTH / 2, HEIGHT / 2 - 75,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
