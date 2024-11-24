@@ -274,7 +274,7 @@ class Tapper(arcade.View):
         self.player_sprite.draw()
         self.beer_list.draw()
         self.customer_list.draw()
-        arcade.draw_text(f"Score: {self.score}", 10, HEIGHT - 30, arcade.color.WHITE, 20)
+        arcade.draw_text(f"Score: {self.window.total_score}", 10, HEIGHT - 30, arcade.color.WHITE, 20)
 
         # lives
         arcade.draw_text(f"Lives: {self.lives}", 10, HEIGHT - 60, arcade.color.WHITE, 20)
