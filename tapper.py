@@ -40,12 +40,12 @@ class Tapper(arcade.View):
         self.customers_per_bar = 2  # Default number of customers per bar
 
         self.level_config = {
-            1: {"speed": 1, "count": 2},  # Slow, 2 customers
-            2: {"speed": 2, "count": 2},  # Fast, 2 customers
-            3: {"speed": 1, "count": 3},  # Slow, 3 customers
-            4: {"speed": 2, "count": 3},  # Fast, 3 customers
+            1: {"speed": 1.25, "count": 2},  # Slow, 2 customers
+            2: {"speed": 1.75, "count": 2},  # Fast, 2 customers
+            3: {"speed": 1.25, "count": 3},  # Slow, 3 customers
+            4: {"speed": 1.75, "count": 3},  # Fast, 3 customers
             5: {"speed": 1, "count": 4},  # Slow, 4 customers
-            6: {"speed": 2, "count": 4},  # Fast, 4 customers
+            6: {"speed": 1.5, "count": 4},  # Fast, 4 customers
         }
 
         self.current_bar = 0
