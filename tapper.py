@@ -486,8 +486,13 @@ class Tapper(arcade.View):
         # Check if all customers are gone and win the round
         if len(self.customer_list) == 0:
             round_win_view = RoundWinView(self.round)  # Pass the current round number
-            self.window.show_view(round_win_view)
             self.window.total_score += 1000
+            if self.round == 6:
+                game_over_view = GameOverView()
+                self.window.show_view(game_over_view)
+            else:
+                self.window.show_view(round_win_view)
+
 
     def on_key_press(self, key, modifiers):
         # Move up and down between bars including cyclical movement

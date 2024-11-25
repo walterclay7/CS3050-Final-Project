@@ -129,7 +129,11 @@ class GameOverView(arcade.View):
         output_total = f"Total Score: {self.window.total_score}"
         arcade.draw_text(output_total, 10, 10, arcade.color.WHITE, 14)
 
+
+
     def on_mouse_press(self, _x, _y, _button, _modifiers):
+        self.window.lives = 3
+        self.window.total_score = 0
         game_view = Tapper()
         self.window.show_view(game_view)
 
@@ -161,7 +165,7 @@ class RoundWinView(arcade.View):
         game_view.reset_round()  # Reset for the next round
         #after round 2 bring up rat round
         if game_view.round == 3 or game_view.round == 5:
-            rat_game = RatGame(game_view.score,self.round_number)
+            rat_game = RatGame(game_view.score, self.round_number)
             rat_game.setup()
             self.window.show_view(rat_game)
         else:
