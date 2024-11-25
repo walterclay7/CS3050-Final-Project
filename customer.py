@@ -19,6 +19,8 @@ class Customer(arcade.Sprite):
 
         self.target_x = None
 
+        self.speed = 1
+
     def hit_customer(self, all_bars_y):
         """Push the customer back slightly on the bar or make them drink."""
         push_back_distance = 299  # Adjust this value for the amount they move back
@@ -68,7 +70,7 @@ class Customer(arcade.Sprite):
             return  # Do nothing else while drinking
 
         # Normal forward movement when not drinking or moving backward
-        self.center_x += person_speed
+        self.center_x += self.speed
 
         if self.right > WIDTH:  # Remove customer if they go off-screen
             self.kill()

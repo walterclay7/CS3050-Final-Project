@@ -36,7 +36,17 @@ class Tapper(arcade.View):
         self.customer_list = None
         self.rat_view = None
 
+        self.customer_speed = 1  # Default speed for customers
+        self.customers_per_bar = 2  # Default number of customers per bar
 
+        self.level_config = {
+            1: {"speed": 1, "count": 2},  # Slow, 2 customers
+            2: {"speed": 2, "count": 2},  # Fast, 2 customers
+            3: {"speed": 1, "count": 3},  # Slow, 3 customers
+            4: {"speed": 2, "count": 3},  # Fast, 3 customers
+            5: {"speed": 1, "count": 4},  # Slow, 4 customers
+            6: {"speed": 2, "count": 4},  # Fast, 4 customers
+        }
 
         self.current_bar = 0
         self.all_bars_y = [150, 250, 350, 450]
@@ -67,29 +77,38 @@ class Tapper(arcade.View):
     def on_show_view(self):
         arcade.set_background_color(arcade.color_from_hex_string("#454545"))
 
+    def update_level_settings(self):
+        """Update customer speed and bar limits based on the current round."""
+        level_settings = self.level_config.get(self.round, {"speed": 2, "count": 2})
+        self.customer_speed = level_settings["speed"]
+        self.customers_per_bar = level_settings["count"]
+        for customer in self.customer_list:
+            customer.speed = self.customer_speed  # Update existing customers
+
     def spawn_initial_wave(self):
-        """Spawns a wave of customers at the beginning of a round."""
-        for _ in range(5):  # Change this number for the size of the wave
-            bar_index = random.randint(0, len(self.all_bars_y) - 1)
-
-            if self.round == 1 and self.patron_count[bar_index] >= 2:
-                continue
-
-            customer = Customer("images/Tapper_cowboy1.png", 1.5, bar_index, self, flipped_horizontally=False)
-            customer.center_x = 50
-            customer.center_y = self.all_bars_y[bar_index] + 65  # Place customers right above the bar
-            self.customer_list.append(customer)
-            self.patron_count[bar_index] += 1
+        """Spawns the initial wave of customers for the round."""
+        self.update_level_settings()
+        for bar_index in range(len(self.all_bars_y)):  # Iterate over each bar
+            while self.patron_count[bar_index] < self.customers_per_bar:  # Ensure exact count per bar
+                customer = Customer("images/Tapper_cowboy1.png", 1.5, bar_index, self, flipped_horizontally=False)
+                # Stagger initial x-positions to avoid overlap
+                customer.center_x = 50 + (self.patron_count[bar_index] * 60)
+                customer.center_y = self.all_bars_y[bar_index] + 65
+                customer.speed = self.customer_speed
+                self.customer_list.append(customer)
+                self.patron_count[bar_index] += 1
 
     def add_customer(self, delta_time: float):
+        """Adds a customer to the game, respecting the level settings."""
+        self.update_level_settings()
         bar_index = random.randint(0, len(self.all_bars_y) - 1)
-        # Ensure max 2 patrons per bar in round 1
-        if self.round == 1 and self.patron_count[bar_index] >= 2:
+        if self.patron_count[bar_index] >= self.customers_per_bar:
             return
 
         customer = Customer("images/Tapper_cowboy1.png", 1.5, bar_index, self, flipped_horizontally=False)
         customer.center_x = 50
-        customer.center_y = self.all_bars_y[bar_index] + 65  # places characters right above bar
+        customer.center_y = self.all_bars_y[bar_index] + 65
+        customer.speed = self.customer_speed  # Set speed
         self.customer_list.append(customer)
         self.patron_count[bar_index] += 1
 
