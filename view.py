@@ -151,6 +151,8 @@ class RoundWinView(arcade.View):
         if self.round_number == 2 or self.round_number == 4:
             arcade.draw_text("GET READY", WIDTH / 2, HEIGHT / 2 - 200,
                              arcade.color.BLACK, font_size=40, anchor_x="center")
+            arcade.draw_text("Press 'Enter' to select the beer that has not been poisoned", WIDTH / 2, HEIGHT / 2 - 250,
+                             arcade.color.BLACK, font_size=20, anchor_x="center", multiline=True)
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         # Transition back to the game view
