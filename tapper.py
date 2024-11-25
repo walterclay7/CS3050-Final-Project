@@ -431,10 +431,11 @@ class Tapper(arcade.View):
             if beer.get_full() == True:
                 customers_hit = arcade.check_for_collision_with_list(beer, self.customer_list)
                 for customer in customers_hit:
-                    beer.kill()
-                    customer.hit_customer(
-                        self.all_bars_y)  # pushes back customer and then throws glass or kills customer
-                    customer.texture = arcade.load_texture("images/tapper_cowboy_drinking_part1.png")
+                    if not customer.get_drinking():
+                        beer.kill()
+                        customer.hit_customer(
+                            self.all_bars_y)  # pushes back customer and then throws glass or kills customer
+                        customer.texture = arcade.load_texture("images/tapper_cowboy_drinking_part1.png")
 
 
         for beer in self.beer_list:
