@@ -16,7 +16,7 @@ class Beer(arcade.Sprite):  # changed this class
             if self.left < 0:
                 self.kill()
         else:
-            self.center_x += beer_speed
+            self.center_x += (beer_speed/2)
             if self.right > WIDTH:
                 self.kill()
 

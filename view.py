@@ -90,7 +90,7 @@ class RoundWinView(arcade.View):
         game_view.round = self.round_number + 1  # Increment the round
         game_view.reset_round()  # Reset for the next round
         #after round 2 bring up rat round
-        if game_view.round==3 or game_view.round == 5:
+        if game_view.round == 3 or game_view.round == 5:
             rat_game = RatGame(game_view.score,self.round_number)
             rat_game.setup()
             self.window.show_view(rat_game)
