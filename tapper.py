@@ -29,7 +29,6 @@ def calc_hexagon(center_x_coord, center_y_coord, radius):
 class Tapper(arcade.View):
     def __init__(self):
         super().__init__()
-        self.lives = 3
         self.round = 1
         self.player_sprite = None
         self.beer_list = None
@@ -332,7 +331,7 @@ class Tapper(arcade.View):
         arcade.draw_text(f"Score: {self.window.total_score}", 10, HEIGHT - 30, arcade.color.WHITE, 20)
 
         # lives
-        arcade.draw_text(f"Lives: {self.lives}", 10, HEIGHT - 60, arcade.color.WHITE, 20)
+        arcade.draw_text(f"Lives: {self.window.lives}", 10, HEIGHT - 60, arcade.color.WHITE, 20)
 
 
 
@@ -444,27 +443,27 @@ class Tapper(arcade.View):
                 self.window.total_score += 100
                 beer.kill()
                 # lives run out = game over
-                if self.lives <= 0:
+                if self.window.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
             # If empty beer reaches end of bar without getting caught
             if beer.right >= WIDTH - 100:
-                self.lives -= 1
+                self.window.lives -= 1
                 # reset round
                 self.reset_round()
                 beer.kill()
                 # lives run out = game over
-                if self.lives <= 0:
+                if self.window.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
             # if full beer reaches end door without hitting customer
             if beer.right <= 90:
-                self.lives -= 1
+                self.window.lives -= 1
                 # reset round
                 self.reset_round()
                 beer.kill()
                 # lives run out = game over
-                if self.lives <= 0:
+                if self.window.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
         # check all customers to make sure they do not get to end of bar before being served
@@ -473,11 +472,11 @@ class Tapper(arcade.View):
             bar_start_x = self.start_x_positions[customer.bar_index]
             if customer.center_x >= bar_end_x:
                 customer.kill()
-                self.lives -= 1
+                self.window.lives -= 1
                 # reset round
                 self.reset_round()
                 # lives run out = game over
-                if self.lives <= 0:
+                if self.window.lives <= 0:
                     game_over_view = GameOverView()
                     self.window.show_view(game_over_view)
             # checks whether customer hit back wall and kills it if it gets pushed back enough

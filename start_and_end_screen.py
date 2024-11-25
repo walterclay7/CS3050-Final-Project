@@ -7,6 +7,7 @@ HEIGHT = 600
 
 def main():
     window = arcade.Window(WIDTH, HEIGHT, "Tapper")
+    window.lives = 3
     window.total_score = 0
     menu_view = MenuView()
     x = window.show_view(menu_view)
